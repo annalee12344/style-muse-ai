@@ -1,65 +1,57 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, ArrowRight, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
-import ImageSearch from "@/components/ImageSearch";
-import StyleFilter from "@/components/StyleFilter";
+import UploadPrompt from "@/components/UploadPrompt";
+import RecommendationResults from "@/components/RecommendationResults";
+import ResultsSkeleton from "@/components/ResultsSkeleton";
+import FeedbackCard from "@/components/FeedbackCard";
 import OutfitCard from "@/components/OutfitCard";
+import { recommend, type RecommendResponse } from "@/lib/api";
 
 import outfit1 from "@/assets/outfit-1.jpg";
 import outfit2 from "@/assets/outfit-2.jpg";
 import outfit3 from "@/assets/outfit-3.jpg";
 import outfit4 from "@/assets/outfit-4.jpg";
-import outfit5 from "@/assets/outfit-5.jpg";
-import outfit6 from "@/assets/outfit-6.jpg";
 
-const outfits = [
-  {
-    image: outfit1,
-    title: "Smart Casual Cuối Tuần",
-    style: "Casual",
-    tags: ["Navy", "Beige", "Sneakers", "Thu Đông"],
-  },
-  {
-    image: outfit2,
-    title: "Summer Getaway",
-    style: "Casual",
-    tags: ["Linen", "Neutral", "Sandals", "Hè"],
-  },
-  {
-    image: outfit3,
-    title: "Elegant Night Out",
-    style: "Dạ tiệc",
-    tags: ["Đen", "Vàng gold", "Heels", "Sang trọng"],
-  },
-  {
-    image: outfit4,
-    title: "Urban Streetwear",
-    style: "Streetwear",
-    tags: ["Hoodie", "Cargo", "Sneakers", "Đường phố"],
-  },
-  {
-    image: outfit5,
-    title: "Business Casual",
-    style: "Công sở",
-    tags: ["Blazer", "Loafers", "Chuyên nghiệp"],
-  },
-  {
-    image: outfit6,
-    title: "Bohemian Spirit",
-    style: "Boho",
-    tags: ["Maxi", "Tự nhiên", "Phụ kiện mây"],
-  },
+const examples = [
+  { image: outfit1, title: "Smart Casual", style: "Casual", tags: ["Navy", "Beige"] },
+  { image: outfit3, title: "Elegant Night", style: "Evening", tags: ["Black", "Gold"] },
+  { image: outfit4, title: "Urban Streetwear", style: "Street", tags: ["Hoodie", "Cargo"] },
+  { image: outfit2, title: "Summer Linen", style: "Casual", tags: ["Linen", "Sandals"] },
 ];
 
-const Index = () => {
-  const [activeFilter, setActiveFilter] = useState("all");
+type Phase = "idle" | "loading" | "results" | "error";
 
-  const handleSearch = (query: string) => {
-    console.log("Search:", query);
+const Index = () => {
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [data, setData] = useState<RecommendResponse | null>(null);
+  const [preview, setPreview] = useState<string>("");
+  const [lastFile, setLastFile] = useState<File | null>(null);
+  const [lastPrompt, setLastPrompt] = useState("");
+
+  const handleSubmit = async (file: File, prompt: string) => {
+    setPreview(URL.createObjectURL(file));
+    setLastFile(file);
+    setLastPrompt(prompt);
+    setPhase("loading");
+    setTimeout(() => {
+      document.getElementById("results")?.scrollIntoView({ behavior: "smooth" });
+    }, 50);
+    try {
+      const res = await recommend(file, prompt);
+      setData(res);
+      setPhase("results");
+    } catch (e) {
+      console.error(e);
+      toast.error("Something went wrong. Please try again.");
+      setPhase("error");
+    }
   };
 
-  const handleImageUpload = (file: File) => {
-    console.log("Uploaded:", file.name);
+  const retry = () => {
+    if (lastFile) handleSubmit(lastFile, lastPrompt);
   };
 
   return (
@@ -67,68 +59,133 @@ const Index = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="pt-28 pb-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
+      <section className="relative pt-32 pb-20 px-6 overflow-hidden animated-gradient">
+        <div className="absolute inset-0 grain-overlay" />
+        <div className="relative max-w-5xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-accent font-medium text-sm tracking-widest uppercase mb-4"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card/70 backdrop-blur border border-border text-xs font-medium text-foreground"
           >
-            Phối đồ thông minh với AI
-          </motion.p>
+            <Sparkles className="w-3.5 h-3.5 text-accent" />
+            AI-powered outfit matching
+          </motion.div>
+
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-display text-5xl md:text-7xl font-bold text-foreground leading-[1.1] tracking-tight"
+            transition={{ delay: 0.1 }}
+            className="font-display text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-foreground mt-6 leading-[1.05]"
           >
-            Tìm phong cách
+            Upload an item.
             <br />
-            <span className="text-gradient">hoàn hảo cho bạn</span>
+            <span className="text-gradient italic">Discover the perfect match.</span>
           </motion.h1>
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed"
+            transition={{ delay: 0.2 }}
+            className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto"
           >
-            Tải ảnh lên hoặc mô tả phong cách bạn muốn — AI sẽ gợi ý những bộ outfit phù hợp nhất
+            Drop a photo of any garment and our vision model retrieves the top 5
+            visually compatible pieces from a curated fashion dataset.
           </motion.p>
         </div>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="mt-10"
+          transition={{ delay: 0.3 }}
+          className="relative mt-12"
         >
-          <ImageSearch onSearch={handleSearch} onImageUpload={handleImageUpload} />
+          <UploadPrompt onSubmit={handleSubmit} loading={phase === "loading"} />
         </motion.div>
       </section>
 
-      {/* Suggestions */}
-      <section className="px-6 pb-20">
+      {/* Results */}
+      <section id="results" className="px-6 pb-20 -mt-4">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-            <div>
-              <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
-                Gợi ý cho bạn
-              </h2>
-              <p className="text-muted-foreground text-sm mt-1">
-                Outfit xu hướng được chọn lọc bởi AI
-              </p>
-            </div>
-            <StyleFilter active={activeFilter} onChange={setActiveFilter} />
-          </div>
+          <AnimatePresence mode="wait">
+            {phase === "loading" && (
+              <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <p className="text-center text-sm text-muted-foreground mb-8 animate-pulse">
+                  Analyzing fashion style…
+                </p>
+                <ResultsSkeleton />
+              </motion.div>
+            )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {outfits.map((outfit, i) => (
-              <OutfitCard key={i} {...outfit} index={i} />
-            ))}
-          </div>
+            {phase === "results" && data && (
+              <motion.div
+                key="results"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-12"
+              >
+                <RecommendationResults uploadedPreview={preview} data={data} />
+                <div className="max-w-2xl mx-auto pt-8">
+                  <FeedbackCard data={data} />
+                </div>
+              </motion.div>
+            )}
+
+            {phase === "error" && (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="glass-card rounded-3xl p-10 text-center max-w-md mx-auto"
+              >
+                <h3 className="font-display text-2xl">Something went wrong</h3>
+                <p className="text-muted-foreground mt-2">
+                  We couldn't analyze that image. Try again?
+                </p>
+                <button
+                  onClick={retry}
+                  className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium"
+                >
+                  <RefreshCw className="w-4 h-4" /> Retry
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </section>
+
+      {/* Examples */}
+      {phase === "idle" && (
+        <section className="px-6 pb-24">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-end justify-between mb-8">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-accent font-medium">
+                  Inspiration
+                </p>
+                <h2 className="font-display text-3xl sm:text-4xl text-foreground mt-2">
+                  Curated outfits to start with
+                </h2>
+              </div>
+              <a
+                href="#"
+                className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-foreground hover:text-accent"
+              >
+                Browse all <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {examples.map((o, i) => (
+                <OutfitCard key={i} {...o} index={i} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <footer className="border-t border-border py-8 px-6 text-center text-sm text-muted-foreground">
+        <p>StyleAI — Crafted for the next generation of fashion discovery.</p>
+      </footer>
     </div>
   );
 };

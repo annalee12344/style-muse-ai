@@ -117,4 +117,31 @@
   .glass-card:hover {
     box-shadow: var(--shadow-card-hover);
   }
+
+  .animated-gradient {
+    background: linear-gradient(
+      120deg,
+      hsl(var(--background)) 0%,
+      hsl(var(--secondary)) 35%,
+      hsl(var(--accent) / 0.18) 65%,
+      hsl(var(--background)) 100%
+    );
+    background-size: 200% 200%;
+    animation: gradientShift 18s ease-in-out infinite;
+  }
+
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .grain-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: radial-gradient(hsl(var(--foreground)) 1px, transparent 1px);
+    background-size: 4px 4px;
+  }
 }
