@@ -6,55 +6,55 @@
 
 @layer base {
   :root {
-    --background: 40 20% 97%;
+    --background: 40 30% 98%;
     --foreground: 30 10% 12%;
 
-    --card: 40 25% 95%;
+    --card: 40 28% 96%;
     --card-foreground: 30 10% 12%;
 
-    --popover: 40 20% 97%;
+    --popover: 40 30% 98%;
     --popover-foreground: 30 10% 12%;
 
     --primary: 30 10% 12%;
-    --primary-foreground: 40 20% 97%;
+    --primary-foreground: 40 30% 98%;
 
-    --secondary: 35 20% 90%;
+    --secondary: 35 22% 92%;
     --secondary-foreground: 30 10% 12%;
 
-    --muted: 35 15% 92%;
+    --muted: 35 18% 93%;
     --muted-foreground: 30 8% 46%;
 
-    --accent: 25 60% 55%;
-    --accent-foreground: 40 20% 97%;
+    --accent: 38 30% 58%;
+    --accent-foreground: 40 30% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 35 15% 85%;
-    --input: 35 15% 88%;
-    --ring: 25 60% 55%;
+    --border: 35 16% 86%;
+    --input: 35 16% 88%;
+    --ring: 38 30% 58%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    --sidebar-background: 40 20% 97%;
+    --sidebar-background: 40 30% 98%;
     --sidebar-foreground: 30 10% 12%;
     --sidebar-primary: 30 10% 12%;
-    --sidebar-primary-foreground: 40 20% 97%;
-    --sidebar-accent: 35 20% 90%;
+    --sidebar-primary-foreground: 40 30% 98%;
+    --sidebar-accent: 35 22% 92%;
     --sidebar-accent-foreground: 30 10% 12%;
-    --sidebar-border: 35 15% 85%;
-    --sidebar-ring: 25 60% 55%;
+    --sidebar-border: 35 16% 86%;
+    --sidebar-ring: 38 30% 58%;
 
     /* Custom tokens */
-    --fashion-warm: 25 60% 55%;
-    --fashion-cream: 40 30% 94%;
+    --fashion-warm: 38 30% 58%;
+    --fashion-cream: 40 30% 96%;
     --fashion-dark: 30 10% 12%;
-    --fashion-gold: 38 70% 55%;
-    --gradient-hero: linear-gradient(135deg, hsl(40 20% 97%) 0%, hsl(35 25% 90%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(40 25% 95% / 0.8) 0%, hsl(40 25% 95% / 0.4) 100%);
-    --shadow-card: 0 4px 24px -4px hsl(30 10% 12% / 0.08);
-    --shadow-card-hover: 0 12px 40px -8px hsl(30 10% 12% / 0.15);
-    --shadow-elevated: 0 20px 60px -12px hsl(30 10% 12% / 0.2);
+    --fashion-champagne: 38 35% 62%;
+    --gradient-hero: radial-gradient(circle at 15% 10%, hsl(40 35% 98%) 0%, hsl(35 28% 92%) 45%, hsl(40 30% 98%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(40 28% 96% / 0.85) 0%, hsl(40 28% 96% / 0.55) 100%);
+    --shadow-card: 0 6px 24px -10px hsl(30 10% 12% / 0.12);
+    --shadow-card-hover: 0 18px 40px -12px hsl(30 10% 12% / 0.18);
+    --shadow-elevated: 0 24px 70px -18px hsl(30 10% 12% / 0.22);
 
     font-family: 'DM Sans', sans-serif;
   }
@@ -85,6 +85,9 @@
     --sidebar-accent-foreground: 40 20% 92%;
     --sidebar-border: 30 8% 22%;
     --sidebar-ring: 25 60% 55%;
+    --fashion-champagne: 38 30% 58%;
+    --gradient-hero: radial-gradient(circle at 20% 10%, hsl(30 10% 10%) 0%, hsl(30 8% 14%) 45%, hsl(30 10% 8%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(30 10% 14% / 0.85) 0%, hsl(30 10% 12% / 0.5) 100%);
   }
 }
 
@@ -95,6 +98,8 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+    background-image: var(--gradient-hero);
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4 {
@@ -143,5 +148,42 @@
     opacity: 0.04;
     background-image: radial-gradient(hsl(var(--foreground)) 1px, transparent 1px);
     background-size: 4px 4px;
+  }
+
+  .lux-card {
+    background: hsl(var(--card) / 0.9);
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-card);
+  }
+
+  .lux-card:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .soft-border {
+    border: 1px solid hsl(var(--border) / 0.7);
+  }
+
+  .glass-panel {
+    background: hsl(var(--card) / 0.7);
+    border: 1px solid hsl(var(--border) / 0.6);
+    backdrop-filter: blur(14px);
+  }
+
+  .masonry {
+    column-gap: 20px;
+  }
+
+  .masonry > * {
+    break-inside: avoid;
+    margin-bottom: 20px;
+  }
+
+  .hover-zoom {
+    transition: transform 0.4s ease, filter 0.4s ease;
+  }
+
+  .hover-zoom:hover {
+    transform: scale(1.03);
   }
 }

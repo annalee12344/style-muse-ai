@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Star, ThumbsUp, ThumbsDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { sendFeedback, type RecommendResponse } from "@/lib/api";
+import { type RecommendResponse } from "@/lib/api";
 
 interface FeedbackCardProps {
   data: RecommendResponse;
@@ -19,21 +19,9 @@ export default function FeedbackCard({ data }: FeedbackCardProps) {
   const submit = async () => {
     if (rating === 0) return toast.error("Please select a rating");
     setLoading(true);
-    try {
-      await sendFeedback({
-        uploaded_item: data.detected_item,
-        recommended_results: data.results,
-        rating,
-        liked,
-        comment: comment.trim(),
-      });
-      setSubmitted(true);
-      toast.success("Thank you for your feedback!");
-    } catch (e) {
-      toast.error("Failed to submit feedback");
-    } finally {
-      setLoading(false);
-    }
+    setSubmitted(true);
+    toast.success("Thank you for your feedback!");
+    setLoading(false);
   };
 
   if (submitted) {

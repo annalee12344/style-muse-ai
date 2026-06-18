@@ -16,13 +16,10 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-8">
-          <a href="#" className="text-sm font-medium text-foreground hover:text-accent transition-colors">
-            Khám phá
-          </a>
-          <a href="#" className="text-sm font-medium text-muted-foreground hover:text-accent transition-colors">
+          <a href="/404" className="text-sm font-medium text-muted-foreground hover:text-accent transition-colors">
             Bộ sưu tập
           </a>
-          <a href="#" className="text-sm font-medium text-muted-foreground hover:text-accent transition-colors">
+          <a href="/404" className="text-sm font-medium text-muted-foreground hover:text-accent transition-colors">
             Xu hướng
           </a>
         </div>
